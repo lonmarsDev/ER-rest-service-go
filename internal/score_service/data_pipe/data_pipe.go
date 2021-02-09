@@ -17,7 +17,7 @@ type DAtaPipeAction interface {
 	computeTeamsScore() float64
 	computeOthersScore() float64
 	Validate() []string
-	Analize() *DataPipe
+	Analize()
 	SetError(format string, a ...interface{}) *DataPipe
 }
 
@@ -62,16 +62,11 @@ func (dp DataPipe)GetScores()*Score{
 	return &dp.Score
 }
 
-func (dp DataPipe)Analize()*DataPipe{
+func (dp DataPipe)Analize() *DataPipe{
 
 	dp.Score.Manager = dp.computeManagersScore()
 	dp.Score.Team = dp.computeTeamsScore()
 	dp.Score.Other = dp.computeOthersScore()
-
-	for _, manager := range dp.Data.AllScore.Managers {
-		dp.Score.Manager  = float64(manager.Score)
-	}
-	dp.Score.Manager = dp.Score.Manager/ float64(len(dp.Data.AllScore.Managers))
 
 	if len(dp.Error)  > 0{
 	 	dp.setSuccess(false)
@@ -83,14 +78,14 @@ func (dp DataPipe)Analize()*DataPipe{
 
 func (dp DataPipe)computeManagersScore()float64 {
 	for _, manager := range dp.Data.AllScore.Managers {
-		dp.Score.Manager  = float64(manager.Score)
+		dp.Score.Manager  += float64(manager.Score)
 	}
 	return dp.Score.Manager/ float64(len(dp.Data.AllScore.Managers))
 }
 
 func (dp DataPipe)computeTeamsScore() float64{
 	for _, team := range dp.Data.AllScore.Team {
-		dp.Score.Team  = float64(team.Score)
+		dp.Score.Team  += float64(team.Score)
 	}
 	return dp.Score.Team/ float64(len(dp.Data.AllScore.Team))
 
@@ -98,9 +93,10 @@ func (dp DataPipe)computeTeamsScore() float64{
 
 func (dp DataPipe)computeOthersScore()float64 {
 	for _, other := range dp.Data.AllScore.Others {
-		dp.Score.Other  = float64(other.Score)
+		dp.Score.Other  += float64(other.Score)
 	}
 	return dp.Score.Other / float64(len(dp.Data.AllScore.Others))
+
 }
 
 
@@ -120,9 +116,9 @@ func (dp DataPipe)Validate() []string {
 	for _, manager := range dp.Data.AllScore.Managers {
 		if users[manager.UserID] == manager.UserID {
 			dp.Error = append(dp.Error, fmt.Sprintf("duplicate user id %d", manager.UserID))
-			if manager.Score >5 {
-				dp.Error = append(dp.Error, fmt.Sprintf("invalid score on user id %d", manager.UserID))
-			}
+		}
+		if manager.Score > 5 {
+			dp.Error = append(dp.Error, fmt.Sprintf("invalid score on user id %d", manager.UserID))
 		}
 		users[manager.UserID] = manager.UserID
 	}

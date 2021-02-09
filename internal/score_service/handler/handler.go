@@ -45,11 +45,12 @@ func(h Handler) CalculateScore(w http.ResponseWriter, r *http.Request){
 
 
 	}else {
-		dp.Analize()
-		scores := dp.GetScores()
-		respHandler.SetData(scores.Manager, scores.Team, scores.Other)
-		respHandler.SetRespCode(http.StatusOK)
-		respHandler.SetSuccess(true)
+		dp = dp.Analize()
+		respHandler.Data.Content.Data.Manager = dp.Score.Manager
+		respHandler.Data.Content.Data.Team = dp.Score.Team
+		respHandler.Data.Content.Data.Others = dp.Score.Other
+		respHandler.RespCode = http.StatusOK
+		respHandler.Data.Content.Success= true
 
 	}
 	respHandler.Render()
