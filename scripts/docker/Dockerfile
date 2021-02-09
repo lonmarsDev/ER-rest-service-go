@@ -18,7 +18,7 @@ RUN go mod download
 COPY . .
 
 # Build the application
-RUN go build -o main cmd/score_service/
+RUN go build -o main cmd/score_service/main.go
 
 # Move to /dist directory as the place for resulting binary folder
 WORKDIR /dist
