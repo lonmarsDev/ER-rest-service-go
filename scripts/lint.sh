@@ -1,0 +1,3 @@
+#!/bin/sh
+cd ..
+golint -set_exit_status=1 ./...
